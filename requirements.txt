@@ -1,0 +1,7 @@
+PyQt5>=5.15.10
+PyQt5-Qt5                   # Pulls in Qt
+python-magic                # For MIME type auto-detection
+pdfminer.six                # For extracting text from PDFs (if you want actual text extract preview)
+PyMuPDF                      # For rendering PDF pages as images (for preview panes, recommended!)
+moviepy
+pygame

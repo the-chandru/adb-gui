@@ -1,0 +1,130 @@
+# This .gitignore file is designed to ignore common files and directories
+# that should not be committed to Git repositories.
+# It covers OS-specific files, IDE files, build artifacts,
+# dependency manager directories, and sensitive data.
+
+# --- Operating System Files ---
+.DS_Store             # macOS directory metadata
+.Trashes              # macOS Trash
+ehthumbs.db           # Windows thumbnail cache
+Thumbs.db             # Windows thumbnail cache
+Desktop.ini           # Windows custom folder settings
+~$* # Windows temporary files for Office documents
+
+# --- IDE Specific Files (Commonly Generated) ---
+
+# Xcode
+# Built products
+build/
+DerivedData/
+*.xcodeproj/xcuserdata/ # User-specific data for Xcode project
+*.xcworkspace/xcuserdata/ # User-specific data for Xcode workspace
+*.xcarchive/          # Archives for distribution
+*.ipa                 # iOS application archives
+*.dSYM.zip            # Debug symbols archives
+*.app                 # Compiled iOS/macOS applications
+*.o                   # Object files
+*.d                   # Dependency files
+
+# Swift Package Manager (SPM)
+.swiftpm/             # SPM related files (e.g., build artifacts, caches)
+.build/               # SPM build directory
+
+# CocoaPods
+Pods/                 # CocoaPods installed libraries
+# Podfile.lock        # Typically committed to ensure consistent dependency versions across developers.
+                      # Uncomment the line below if you prefer NOT to commit it (less common).
+# Podfile.lock
+
+# Carthage
+Carthage/             # Carthage installed frameworks
+
+# Android Studio / IntelliJ IDEA
+.idea/                # IntelliJ IDEA project files (user-specific, configurations, etc.)
+*.iml                 # IntelliJ IDEA module files
+*.ipr                 # IntelliJ IDEA project files (old format)
+*.iws                 # IntelliJ IDEA workspace files (old format)
+local.properties      # Android SDK location, user-specific settings
+.gradle/              # Gradle caches and build files
+build/                # Android build output directory
+
+# Visual Studio Code
+.vscode/              # VS Code workspace settings (often committed for shared configs, but can exclude user specific ones)
+# For user-specific settings that shouldn't be shared (e.g., local launch configs, temp files)
+# .vscode/*.local.json
+# .vscode/.history/
+
+# Generic IDE/Editor Backup Files
+*~                    # Emacs/Vim temporary files
+*.bak                 # Backup files
+*.swp                 # Vim swap files
+.DS_Store?            # macOS Finder caches
+
+# --- Dependency Management (General) ---
+node_modules/         # Node.js dependencies
+npm-debug.log         # npm debug logs
+yarn-error.log        # Yarn error logs
+target/               # Java Maven/Gradle build output (often contains compiled classes, JARs)
+vendor/               # PHP Composer dependencies, Ruby Bundler (sometimes)
+*.pyc                 # Python compiled files
+__pycache__/          # Python 3 bytecode cache
+__pycache__
+.venv/                # Python virtual environment (often named 'venv' or '.venv')
+venv/                 # Another common name for Python virtual environment
+
+# --- Build Artifacts / Outputs ---
+bin/                  # Compiled binaries (if not part of the source)
+obj/                  # Intermediate object files
+dist/                 # Distribution package output
+temp/                 # Temporary compilation directories
+tmp/                  # Generic temporary directory
+*.log                 # Log files
+*.out                 # Generic output files
+*.exe                 # Executables (Windows)
+*.dll                 # Dynamic Link Libraries (Windows)
+*.so                  # Shared Objects (Linux)
+*.dylib               # Dynamic Libraries (macOS)
+*.jar                 # Java Archive files
+*.war                 # Java Web Archive files
+*.zip                 # Compressed archives
+*.tar                 # Tar archives
+*.rar                 *.7z            # Other archive formats
+
+# --- Sensitive Data / Configuration (Should NEVER be committed) ---
+# Ensure these are not accidentally committed.
+# Create template files for these and instruct developers to copy and fill.
+.env                  # Environment variables (e.g., for backend apps)
+.env.*.local          # Local environment variables
+config.local.js       # Local configuration files
+secrets.plist         # iOS/macOS property list with secrets
+APIKeys.swift         # Swift file with API keys
+*.pem                 # Private keys
+*.key                 # Private keys
+*.cert                # Certificates
+*.p12                 # PKCS#12 archives
+*.mobileprovision     # iOS provisioning profiles
+
+# --- Xcodeproj (More specific exclusions, if not handled by above) ---
+# Generally, the .xcodeproj folder itself IS committed, but internal user-specific
+# or generated files within it are excluded.
+# If you are using a project generator like XcodeGen, the .xcodeproj itself might be ignored.
+# For manual projects, these are good to ignore:
+*.xcodeproj/project.xcworkspace/       # User's workspace settings within the project bundle
+# The following usually IS committed for shared schemes/configurations
+# *.xcodeproj/xcshareddata/
+
+# Xcode specific cache directories and files that should not be committed.
+DerivedData
+*.xcuserstate
+*.mode1v3
+*.pbxuser
+*.perspectivev3
+*.xccheckout
+*.xcscmblueprint
+*.xodesignablespec
+profile/
+*.moved-aside
+*.xcuserstate
+
+# Backups of the project file
+*.xcodeproj/*.backup*
