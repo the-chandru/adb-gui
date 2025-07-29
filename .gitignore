@@ -59,6 +59,7 @@ build/                # Android build output directory
 *.bak                 # Backup files
 *.swp                 # Vim swap files
 .DS_Store?            # macOS Finder caches
+.DS_Store
 
 # --- Dependency Management (General) ---
 node_modules/         # Node.js dependencies

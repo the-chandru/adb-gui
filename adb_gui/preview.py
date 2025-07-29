@@ -18,7 +18,7 @@ Note: For video and audio, codecs and system support may be required
 
 import os
 from PyQt5.QtWidgets import (
-    QLabel, QVBoxLayout, QWidget, QTextEdit
+    QLabel, QVBoxLayout, QWidget, QTextEdit, QSizePolicy, QScrollArea
 )
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt, QUrl
@@ -56,17 +56,27 @@ class ImagePreviewWidget(QWidget):
     """
     def __init__(self, image_path):
         super().__init__()
-        label = QLabel()
-        label.setAlignment(Qt.AlignCenter)
-        pm = QPixmap(image_path)
-        if not pm.isNull():
-            # Scale to fit content but never upsize
-            label.setPixmap(pm.scaled(360, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        else:
-            label.setText("Invalid image file")
+        self.image_path = image_path
+        self.label = QLabel(self)
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         layout = QVBoxLayout(self)
-        layout.addWidget(label)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.label)
         self.setLayout(layout)
+        self.pixmap = QPixmap(image_path)
+        self.update_pixmap()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.update_pixmap()
+
+    def update_pixmap(self):
+        if not self.pixmap.isNull():
+            scaled = self.pixmap.scaled(self.width(), self.height(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.label.setPixmap(scaled)
+        else:
+            self.label.setText("Invalid Image")
 
 class TextPreviewWidget(QWidget):
     """
@@ -93,13 +103,17 @@ class VideoPreviewWidget(QWidget):
     def __init__(self, video_path):
         super().__init__()
         self.layout = QVBoxLayout(self)
-        self.video_widget = QVideoWidget(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.video_widget = QVideoWidget()
+        self.video_widget.setMinimumSize(400, 300)
+        self.video_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.layout.addWidget(self.video_widget)
+        self.setLayout(self.layout)
+
         self.player = QMediaPlayer(self)
         self.player.setVideoOutput(self.video_widget)
         self.player.setMedia(QMediaContent(QUrl.fromLocalFile(video_path)))
         self.player.play()
-        self.layout.addWidget(self.video_widget)
-        self.video_widget.setMinimumSize(360, 240)
         self.video_widget.show()
 
 class AudioPreviewWidget(QWidget):
@@ -121,29 +135,44 @@ class AudioPreviewWidget(QWidget):
 
 class PDFPreviewWidget(QWidget):
     """
-    PDF preview using PyMuPDF (fitz) -- renders the first page as an image.
+    PDF preview as scrollable image(s) using PyMuPDF (fitz).
+    Displays the first N pages as images, vertically scrollable.
     """
-    def __init__(self, file_path):
+    def __init__(self, file_path, max_pages=10):
         super().__init__()
         layout = QVBoxLayout(self)
+        scroll = QScrollArea(self)
+        scroll.setWidgetResizable(True)
+        container = QWidget()
+        vbox = QVBoxLayout(container)
+        vbox.setContentsMargins(5, 5, 5, 5)
+
         if HAVE_FITZ:
             try:
                 doc = fitz.open(file_path)
-                if doc.page_count > 0:
-                    page = doc.load_page(0)
-                    pix = page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8))
-                    img_data = pix.tobytes('ppm')
+                pages = min(max_pages, doc.page_count)
+                if pages == 0:
+                    vbox.addWidget(QLabel("(Empty PDF)"))
+                for i in range(pages):
+                    page = doc.load_page(i)
+                    pix = page.get_pixmap(matrix=fitz.Matrix(1.5,1.5))
+                    img_data = pix.tobytes("ppm")
                     pm = QPixmap()
                     pm.loadFromData(img_data)
+                    scaled = pm.scaled(self.width(), self.height(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
                     label = QLabel()
-                    label.setPixmap(pm.scaled(360, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-                    layout.addWidget(label)
-                else:
-                    layout.addWidget(QLabel("(Empty PDF)"))
+                    label.setPixmap(scaled)
+                    label.setAlignment(Qt.AlignCenter)
+                    label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                    vbox.addWidget(label)
             except Exception as e:
-                layout.addWidget(QLabel(f"PDF could not be rendered: {e}"))
+                vbox.addWidget(QLabel(f"PDF could not be rendered: {e}"))
         else:
-            layout.addWidget(QLabel("PDF Preview requires PyMuPDF (fitz)"))
+            vbox.addWidget(QLabel("PDF Preview requires PyMuPDF (fitz)"))
+
+        container.setLayout(vbox)
+        scroll.setWidget(container)
+        layout.addWidget(scroll)
         self.setLayout(layout)
 
 # --- Preview Factory ---

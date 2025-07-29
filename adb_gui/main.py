@@ -139,15 +139,17 @@ class ADBGui(QWidget):
 
         # Container for preview widget(s)
         self.preview_container = QWidget()
+        self.preview_container.setMinimumSize(400, 300)
         self.preview_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.preview_container.setObjectName("previewContainer")
+        self.preview_container.setStyleSheet("QWidget#previewContainer { border: 1px solid gray; border-radius: 5px;}")
         self.preview_layout = QVBoxLayout(self.preview_container)
-        self.preview_layout.setContentsMargins(0, 0, 0, 0)
+        self.preview_layout.setContentsMargins(5,5,5,5)
         self.preview_layout.setSpacing(0)
+        self.preview_layout.setAlignment(Qt.AlignCenter)
         self.preview_label = QLabel('Preview Area')
         self.preview_label.setAlignment(Qt.AlignCenter)
-        self.preview_label.setFixedHeight(280)
         self.preview_label.setWordWrap(True)
-        self.preview_label.setStyleSheet("border: 1px solid gray;")
         self.preview_layout.addWidget(self.preview_label)
         right_layout.addWidget(self.preview_container)
 
@@ -348,10 +350,10 @@ class ADBGui(QWidget):
                 self._current_preview_widget = preview_widget  # Keep reference to prevent GC
                 
                 # Special handling if it is a video widget
-                from PyQt5.QtMultimediaWidgets import QVideoWidget
-                if isinstance(preview_widget, QVideoWidget):
-                    preview_widget.setMinimumSize(360, 240)
-                    preview_widget.show()
+                # from PyQt5.QtMultimediaWidgets import QVideoWidget
+                # if isinstance(preview_widget, QVideoWidget):
+                #     preview_widget.setMinimumSize(360, 240)
+                #     preview_widget.show()
                 
                 self.preview_layout.addWidget(preview_widget)
             elif finished:
@@ -365,18 +367,10 @@ class ADBGui(QWidget):
         while self.preview_layout.count():
             child = self.preview_layout.takeAt(0)
             widget = child.widget()
-            if widget is not None:
+            if widget:
                 widget.setParent(None)
                 widget.deleteLater()
-        # Add fresh placeholder label
-        # self.preview_label = QLabel('Preview Area')
-        # self.preview_label.setAlignment(Qt.AlignCenter)
-        # self.preview_label.setWordWrap(True)
-        # self.preview_label.setMinimumHeight(280)
-        # self.preview_label.setStyleSheet("border: 1px solid gray;")
-        # self.preview_layout.addWidget(self.preview_label)
-
-
+        
 
     # === Drag and Drop Handlers ===
 
@@ -505,6 +499,12 @@ class ADBGui(QWidget):
     # --- Cleanup temp files on close ---
 
     def closeEvent(self, event):
+        # Stop any active media player
+        if hasattr(self, "_current_preview_widget") and self._current_preview_widget is not None:
+            widget = self._current_preview_widget
+            player = getattr(widget, "player", None)
+            if player is not None:
+                player.stop()
         for file in self.temp_preview_files:
             try:
                 if os.path.exists(file):
