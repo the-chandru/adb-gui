@@ -18,6 +18,12 @@
 - **Detailed Logging:** Console panel with full adb output and any errors.
 - **Cross-Platform:** Works on macOS, Linux, and Windows.
 
+## Screenshots
+
+![Main window screenshot](images/screenshot1.png)
+
+![File preview screenshot](images/screenshot2.png)
+
 ## Requirements
 
 - Python 3.7+
